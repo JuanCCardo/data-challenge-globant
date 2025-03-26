@@ -11,10 +11,10 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS hired_employees (
             id INTEGER PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            datetime TIMESTAMP NOT NULL,
-            department_id INTEGER NOT NULL,
-            job_id INTEGER NOT NULL
+            name VARCHAR(255),
+            datetime TIMESTAMP,
+            department_id INTEGER,
+            job_id INTEGER
         );
     """)
 
@@ -22,7 +22,7 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS departments (
             id INTEGER PRIMARY KEY,
-            department VARCHAR(255) NOT NULL
+            department VARCHAR(255)
         );
     """)
 
@@ -30,7 +30,7 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS jobs (
             id INTEGER PRIMARY KEY,
-            job VARCHAR(255) NOT NULL
+            job VARCHAR(255)
         );
     """)
 
