@@ -177,6 +177,133 @@ def insertar_lote(empleados: list[dict]):
         cursor.close()
         conexion.close()
 
+def obtener_contrataciones_por_trimestre():
+    """
+    Obtiene el número de empleados contratados por cada trabajo y departamento en 2021, dividido por trimestre.
+
+    Returns:
+        list: Lista de diccionarios con las contrataciones por trimestre.
+
+    Raises:
+        HTTPException: Si hay un error al conectar a la base de datos o al ejecutar la consulta.
+    """
+    conexion = get_db_connection()
+    if conexion is None:
+        raise HTTPException(status_code=500, detail="Fallo al conectar con la base de datos")
+
+    cursor = conexion.cursor()
+    try:
+        cursor.execute("""
+            SELECT 
+                COALESCE(d.department, 'Unknown') as department,
+                COALESCE(j.job, 'Unknown') as job,
+                SUM(CASE WHEN EXTRACT(MONTH FROM e.datetime) BETWEEN 1 AND 3 THEN 1 ELSE 0 END) as Q1,
+                SUM(CASE WHEN EXTRACT(MONTH FROM e.datetime) BETWEEN 4 AND 6 THEN 1 ELSE 0 END) as Q2,
+                SUM(CASE WHEN EXTRACT(MONTH FROM e.datetime) BETWEEN 7 AND 9 THEN 1 ELSE 0 END) as Q3,
+                SUM(CASE WHEN EXTRACT(MONTH FROM e.datetime) BETWEEN 10 AND 12 THEN 1 ELSE 0 END) as Q4
+            FROM hired_employees e
+            LEFT JOIN departments d ON e.department_id = d.id
+            LEFT JOIN jobs j ON e.job_id = j.id
+            WHERE EXTRACT(YEAR FROM e.datetime) = 2021
+            GROUP BY d.department, j.job
+            ORDER BY COALESCE(d.department, 'Unknown'), COALESCE(j.job, 'Unknown');
+        """)
+        filas = cursor.fetchall()
+        resultado = [
+            {
+                "departamento": fila[0],
+                "trabajo": fila[1],
+                "Q1": int(fila[2]),
+                "Q2": int(fila[3]),
+                "Q3": int(fila[4]),
+                "Q4": int(fila[5])
+            }
+            for fila in filas
+        ]
+        return resultado
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conexion.close()
+
+@app.get("/contrataciones-por-trimestre")
+def contrataciones_por_trimestre():
+    """
+    Endpoint para obtener las contrataciones por trimestre en 2021.
+
+    Returns:
+        list: Lista de diccionarios con las contrataciones por trimestre.
+    """
+    return obtener_contrataciones_por_trimestre()
+
+def obtener_departamentos_sobre_promedio():
+    """
+    Obtiene los departamentos que contrataron más empleados que el promedio en 2021.
+
+    Returns:
+        list: Lista de diccionarios con los departamentos que superan el promedio.
+
+    Raises:
+        HTTPException: Si hay un error al conectar a la base de datos o al ejecutar la consulta.
+    """
+    conexion = get_db_connection()
+    if conexion is None:
+        raise HTTPException(status_code=500, detail="Fallo al conectar con la base de datos")
+
+    cursor = conexion.cursor()
+    try:
+        # Calcular el promedio de contrataciones en 2021
+        cursor.execute("""
+            SELECT AVG(cuenta_contrataciones)
+            FROM (
+                SELECT COUNT(*) as cuenta_contrataciones
+                FROM hired_employees
+                WHERE EXTRACT(YEAR FROM datetime) = 2021
+                GROUP BY department_id
+            ) as subconsulta;
+        """)
+        promedio_contrataciones = cursor.fetchone()[0]
+
+        # Obtener departamentos por encima del promedio
+        cursor.execute("""
+            SELECT 
+                COALESCE(d.id, 0) as id,
+                COALESCE(d.department, 'Unknown') as department,
+                COUNT(e.id) as contratados
+            FROM hired_employees e
+            LEFT JOIN departments d ON e.department_id = d.id
+            WHERE EXTRACT(YEAR FROM e.datetime) = 2021
+            GROUP BY d.id, d.department
+            HAVING COUNT(e.id) > %s
+            ORDER BY contratados DESC;
+        """, (promedio_contrataciones,))
+        filas = cursor.fetchall()
+        resultado = [
+            {
+                "id": fila[0],
+                "departamento": fila[1],
+                "contratados": int(fila[2])
+            }
+            for fila in filas
+        ]
+        return resultado
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conexion.close()
+
+@app.get("/departamentos-sobre-promedio")
+def departamentos_sobre_promedio():
+    """
+    Endpoint para obtener los departamentos con contrataciones por encima del promedio en 2021.
+
+    Returns:
+        list: Lista de diccionarios con los departamentos que superan el promedio.
+    """
+    return obtener_departamentos_sobre_promedio()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
