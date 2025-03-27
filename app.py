@@ -1,9 +1,21 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import csv
 import psycopg2
 from db import get_db_connection
+from datetime import datetime
+import os
 
 app = FastAPI()
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+)
 
 def insertar_datos_desde_csv(nombre_tabla: str, ruta_archivo: str):
     """

@@ -13,4 +13,4 @@ def get_db_connection():
         return conn
     except Exception as e:
         print(f"Error conexión al database: {e}")
-        return Nonec
+        return None
