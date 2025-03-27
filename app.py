@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import csv
+import psycopg2
 from db import get_db_connection
 
 app = FastAPI()
@@ -303,6 +304,30 @@ def departamentos_sobre_promedio():
         list: Lista de diccionarios con los departamentos que superan el promedio.
     """
     return obtener_departamentos_sobre_promedio()
+
+def get_db_connection():
+    conn = psycopg2.connect(
+        host=os.getenv("POSTGRES_HOST", "localhost"),
+        port=os.getenv("POSTGRES_PORT", "5434"),
+        user=os.getenv("POSTGRES_USER", "postgres"),
+        password=os.getenv("POSTGRES_PASSWORD", "caballo"),
+        dbname=os.getenv("POSTGRES_DB", "globant_db")
+    )
+    return conn
+
+@app.get("/")
+def read_root():
+    return {"message": "¡Hola desde Docker!"}
+
+@app.get("/test-db")
+def test_db():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        return {"status": "Conexión a la base de datos exitosa"}
+    except Exception as e:
+        return {"status": "Error al conectar a la base de datos", "error": str(e)}
+
 
 if __name__ == "__main__":
     import uvicorn
