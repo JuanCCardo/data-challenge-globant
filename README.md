@@ -151,9 +151,9 @@ Usa las credenciales del paso anterior.
 ## Endpoints
 La API ofrece los siguientes endpoints, accesibles en http://localhost:8000/docs localmente o en la URL del App Service tras el despliegue:
 
-- POST /cargar-csv/{nombre_tabla}
+- **`POST /cargar-csv/{nombre_tabla}`**
      - Carga datos desde un archivo CSV a la base de datos.
-    - Ejemplo: /cargar-csv/departments
+    - Ejemplo: `/cargar-csv/departments`
 
 - **`POST /insertar-lote`**  
   Inserta una lista de empleados en la base de datos.  
@@ -163,10 +163,10 @@ La API ofrece los siguientes endpoints, accesibles en http://localhost:8000/docs
     {"id": 1, "name": "John Doe", "datetime": "2021-05-01T10:00:00Z", "department_id": 1, "job_id": 1}
   ]
 
--GET /contrataciones-por-trimestre
+- **`GET /contrataciones-por-trimestre`**
     - Obtiene el número de empleados contratados por trimestre en 2021.
 
--GET /departamentos-sobre-promedio
+- **`GET /departamentos-sobre-promedio`**
     - Obtiene los departamentos que contrataron más empleados que el promedio en 2021.
 
 ## Notas
