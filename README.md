@@ -60,7 +60,7 @@ Accede al contenedor de la API:
    ```bash
    python init_db.py
     ```
-    
+
 7. Accede a la API:
 Abre tu navegador y ve a http://localhost:8000/docs para probar los endpoints.
 
@@ -152,8 +152,8 @@ Usa las credenciales del paso anterior.
 La API ofrece los siguientes endpoints, accesibles en http://localhost:8000/docs localmente o en la URL del App Service tras el despliegue:
 
 - POST /cargar-csv/{nombre_tabla}
-Carga datos desde un archivo CSV a la base de datos.
-- Ejemplo: /cargar-csv/departments
+     - Carga datos desde un archivo CSV a la base de datos.
+    - Ejemplo: /cargar-csv/departments
 
 - **`POST /insertar-lote`**  
   Inserta una lista de empleados en la base de datos.  
@@ -164,10 +164,10 @@ Carga datos desde un archivo CSV a la base de datos.
   ]
 
 -GET /contrataciones-por-trimestre
-Obtiene el número de empleados contratados por trimestre en 2021.
+    - Obtiene el número de empleados contratados por trimestre en 2021.
 
 -GET /departamentos-sobre-promedio
-Obtiene los departamentos que contrataron más empleados que el promedio en 2021.
+    - Obtiene los departamentos que contrataron más empleados que el promedio en 2021.
 
 ## Notas
 - **Archivos CSV:** Para que el endpoint /cargar-csv/{nombre_tabla} funcione en el despliegue, los archivos CSV (departments.csv, jobs.csv, hired_employees.csv) deben estar disponibles dentro del contenedor o subidos a un almacenamiento en la nube como Azure Blob Storage.
