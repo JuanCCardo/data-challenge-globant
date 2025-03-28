@@ -99,3 +99,78 @@ En el Azure Portal, busca **"Resource groups"** y crea uno con la siguiente conf
 - **Configuración:**  
   - Habilita la opción **Admin user**  
   - Anota las credenciales generadas (usuario y contraseña del registry)
+
+### 4. Sube la imagen Docker
+
+- **NoAutentica Docker con ACR:*
+   ```bash
+   docker login globantacr.azurecr.io
+
+Usa las credenciales del paso anterior.
+- Construye y sube la imagen:
+   ```bash
+   docker build -t globantacr.azurecr.io/globant-api:latest .
+   docker push globantacr.azurecr.io/globant-api:latest
+
+### 5. Crear un App Service
+
+**Busca "App Services" y crea uno nuevo**:
+   - En el Azure Portal, busca "App Services" y selecciona "Create" para crear uno nuevo.
+
+**Configura el App Service**:
+   - Nombre: `globant-api-juanc1808`
+   - Publish: `Docker Container`
+   - Operating System: `Linux`
+   - Region: `West US`
+   - App Service Plan: Crea uno nuevo con:
+     - Nombre: `GlobantAppServicePlan`
+     - SKU: `B1`
+   - Image Source: `Azure Container Registry`
+   - Registry: `globantacr`
+   - Image: `globant-api`
+   - Tag: `latest`
+
+### 6. Configura las variables de entorno
+
+
+**Configura las variables de entorno**:
+   - En el Azure Portal, ve a la sección "Configuration" del App Service y añade las siguientes variables:
+     - `POSTGRES_HOST`: `globantdbserver.postgres.database.azure.com`
+     - `POSTGRES_PORT`: `5432`
+     - `POSTGRES_USER`: `postgres`
+     - `POSTGRES_PASSWORD`: `XXXXX`
+     - `POSTGRES_DB`: `globant_db`
+
+### 7. Accede a la API
+
+**Accede a la API**:
+   - En el App Service, busca la URL (por ejemplo, `https://globant-api-juanc1808.azurewebsites.net`).
+   - Abre la URL con `/docs` (por ejemplo, `https://globant-api-juanc1808.azurewebsites.net/docs`).
+
+
+## Endpoints
+La API ofrece los siguientes endpoints, accesibles en http://localhost:8000/docs localmente o en la URL del App Service tras el despliegue:
+
+- POST /cargar-csv/{nombre_tabla}
+Carga datos desde un archivo CSV a la base de datos.
+Ejemplo: /cargar-csv/departments
+
+-POST /insertar-lote
+Inserta una lista de empleados en la base de datos.
+
+Ejemplo de cuerpo de la solicitud:
+   ```bash
+   [{"id": 1, "name": "John Doe", "datetime": "2021-05-01T10:00:00Z", "department_id": 1, "job_id": 1}]
+
+
+- GET /contrataciones-por-trimestre
+Obtiene el número de empleados contratados por trimestre en 2021.
+
+- GET /departamentos-sobre-promedio
+Obtiene los departamentos que contrataron más empleados que el promedio en 2021.
+
+
+## Notas
+- **Archivos CSV:** Para que el endpoint /cargar-csv/{nombre_tabla} funcione en el despliegue, los archivos CSV (departments.csv, jobs.csv, hired_employees.csv) deben estar disponibles dentro del contenedor o subidos a un almacenamiento en la nube como Azure Blob Storage.
+- **Seguridad en producción:** En un entorno de producción, configura reglas de firewall más estrictas para la base de datos y utiliza una red privada (e.g., Azure Virtual Network) para mayor seguridad.
+- **Pruebas:** Las pruebas en test/test_api.py verifican la carga de datos CSV y la inserción de empleados en lotes. Asegúrate de ejecutarlas para validar la funcionalidad.
