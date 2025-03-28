@@ -54,11 +54,13 @@ Este repositorio contiene mi solución al reto de Data Engineering de Globant. L
 Accede al contenedor de la API:
    ```bash
    docker-compose exec api bash
-    
-6. Ejecutar:
-```bash
-   python init_db.py
+    ```
 
+6. **Ejecutar:**
+   ```bash
+   python init_db.py
+    ```
+    
 7. Accede a la API:
 Abre tu navegador y ve a http://localhost:8000/docs para probar los endpoints.
 
@@ -132,7 +134,6 @@ Usa las credenciales del paso anterior.
 
 ### 6. Configura las variables de entorno
 
-
 **Configura las variables de entorno**:
    - En el Azure Portal, ve a la sección "Configuration" del App Service y añade las siguientes variables:
      - `POSTGRES_HOST`: `globantdbserver.postgres.database.azure.com`
@@ -147,7 +148,6 @@ Usa las credenciales del paso anterior.
    - En el App Service, busca la URL (por ejemplo, `https://globant-api-juanc1808.azurewebsites.net`).
    - Abre la URL con `/docs` (por ejemplo, `https://globant-api-juanc1808.azurewebsites.net/docs`).
 
-
 ## Endpoints
 La API ofrece los siguientes endpoints, accesibles en http://localhost:8000/docs localmente o en la URL del App Service tras el despliegue:
 
@@ -155,12 +155,13 @@ La API ofrece los siguientes endpoints, accesibles en http://localhost:8000/docs
 Carga datos desde un archivo CSV a la base de datos.
 - Ejemplo: /cargar-csv/departments
 
--POST /insertar-lote
-Inserta una lista de empleados en la base de datos.
-- Ejemplo de cuerpo de la solicitud:
-   ```bash
-   [{"id": 1, "name": "John Doe", "datetime": "2021-05-01T10:00:00Z", "department_id": 1, "job_id": 1}]
-    ```bash
+- **`POST /insertar-lote`**  
+  Inserta una lista de empleados en la base de datos.  
+  Ejemplo de cuerpo de la solicitud:  
+  ```json
+  [
+    {"id": 1, "name": "John Doe", "datetime": "2021-05-01T10:00:00Z", "department_id": 1, "job_id": 1}
+  ]
 
 -GET /contrataciones-por-trimestre
 Obtiene el número de empleados contratados por trimestre en 2021.
